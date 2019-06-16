@@ -4,10 +4,7 @@ import {Image} from 'react-native-elements';
 
 class ImageCard extends React.PureComponent {
 
-    renderLoader(){
-        if(this.props.images==[])
-        <Text>Loading...</Text>
-    }
+  
 
 renderItem =({item}) =>(
     
@@ -26,13 +23,14 @@ renderItem =({item}) =>(
 
     render(){
         
-        this.renderLoader();
+        
     return (
          <FlatList 
        data={this.props.images}
        renderItem={this.renderItem}
        keyExtractor={(item,index) =>item.id}
-       numColumns={2}
+       key={this.props.value}
+       numColumns={this.props.value}
        />
       
     )

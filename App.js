@@ -7,7 +7,7 @@ import unsplash from './api/unsplash';
 
 class App extends React.Component {
   
-  state={images:[]};
+  state={images:[],value:2};
 
   onValueSubmit= async(search) => {
     const response=await unsplash.get('/search/photos',
@@ -23,15 +23,21 @@ class App extends React.Component {
     
   };
 
+  onValueSelect = (value) => {
+
+this.setState({value})
+  }
+
   
   
   render(){
    
     return (
       <View>
-       <Header headerText= 'Imagify'/>
+       
+       <Header headerText= 'Imagify' onSelect={this.onValueSelect}/>
        <SearchInput onSubmit={this.onValueSubmit}/>
-       <ImageCard images={this.state.images}/>
+       <ImageCard images={this.state.images} value={this.state.value}/>
        
        </View>
       

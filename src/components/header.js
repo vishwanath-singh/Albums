@@ -1,14 +1,32 @@
 import React from 'react';
-import {Text, StyleSheet,View} from 'react-native';
+import {Text, StyleSheet,View,Picker} from 'react-native';
 
 
-const Header = (props) => {
-    
+class Header extends React.Component {
+state={value:2}
+render(){
     return (
+        <View>
         <View style={styles.viewStyle}>
-        <Text style={styles.textStyle}>{props.headerText}</Text>
-        </View>
+        <Text style={styles.textStyle}>{this.props.headerText}</Text>
+</View>
+<Picker 
+selectedValue={this.state.value}
+style={{height: 50, width: 200}}
+onValueChange={(itemValue, itemIndex) =>{
+      this.props.onSelect(itemValue)
+      this.setState({value:itemValue})
+}
+  }
+  >
+<Picker.Item label="Grid 2" value="2" />
+<Picker.Item label="Grid 3" value="3" />
+<Picker.Item label="Grid 4" value="4" />
+
+</Picker>
+</View>
     );
+    }
 };
 
 const styles= StyleSheet.create({
@@ -21,13 +39,13 @@ viewStyle:{
     shadowColor:'#000',
     shadowOffset:{width:0,height:2},
     shadowOpacity:0.2,
-    elevation:2,
     position:'relative'
     },
     
     textStyle: {
         fontSize:20
-    }
+    },
+    
 });
 
 export default Header;
