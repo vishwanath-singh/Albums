@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import Header from './src/components/header';
 import SearchInput from './src/components/SearchInput';
-import ImageList from './src/components/ImageList';
+import ImageCard from './src/components/ImageCard';
 import unsplash from './api/unsplash';
 
 class App extends React.Component {
@@ -13,20 +13,26 @@ class App extends React.Component {
     const response=await unsplash.get('/search/photos',
     {
         params:{
-            query:search
+            query:search,
+            per_page:100,
+            orientation:'squarish'
         }
     
     });
     this.setState({images:response.data.results});
-    console.log(this.state.images.length);
+    
   };
+
+  
   
   render(){
+   
     return (
       <View>
        <Header headerText= 'Imagify'/>
        <SearchInput onSubmit={this.onValueSubmit}/>
-       <ImageList images={this.state.images}/>
+       <ImageCard images={this.state.images}/>
+       
        </View>
       
     )
