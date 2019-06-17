@@ -12,7 +12,7 @@ render(){
 </View>
 <Picker 
 selectedValue={this.state.value}
-style={{height: 50, width: 200}}
+style={{height: 50, width: 150}}
 onValueChange={(itemValue, itemIndex) =>{
       this.props.onSelect(itemValue)
       this.setState({value:itemValue})

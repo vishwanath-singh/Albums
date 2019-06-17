@@ -4,7 +4,7 @@ import {Image} from 'react-native-elements';
 
 class ImageCard extends React.PureComponent {
 
-  
+   state={page_no:1}
 
 renderItem =({item}) =>(
     
@@ -20,17 +20,25 @@ renderItem =({item}) =>(
             
 );
 
+loadMore = () => {
+  let page=this.state.page_no+1;
+  this.setState({page_no:page})
+  this.props.onScroll(this.state.page_no)
+}
+
 
     render(){
         
-        
-    return (
+        return (
          <FlatList 
        data={this.props.images}
        renderItem={this.renderItem}
        keyExtractor={(item,index) =>item.id}
        key={this.props.value}
        numColumns={this.props.value}
+
+       onEndReached={this.loadMore}
+       onEndReachedThreshold={0.9}
        />
       
     )
@@ -46,8 +54,7 @@ const styles= StyleSheet.create({
       },
     
       imageThumbnail: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        
         height: 100,
       
       }
