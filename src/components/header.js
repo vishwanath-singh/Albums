@@ -3,7 +3,14 @@ import {Text, StyleSheet,View,Picker} from 'react-native';
 
 
 class Header extends React.Component {
-state={value:2}
+state={gridValue:2}
+
+onValueChange = (itemValue, itemIndex) => {
+        this.props.onSelect(itemValue)
+        this.setState({gridValue:itemValue})
+  
+}
+
 render(){
     return (
         <View>
@@ -11,13 +18,9 @@ render(){
         <Text style={styles.textStyle}>{this.props.headerText}</Text>
 </View>
 <Picker 
-selectedValue={this.state.value}
+selectedValue={this.state.gridValue}
 style={{height: 50, width: 150}}
-onValueChange={(itemValue, itemIndex) =>{
-      this.props.onSelect(itemValue)
-      this.setState({value:itemValue})
-}
-  }
+onValueChange={ this.onValueChange}
   >
 <Picker.Item label="Grid 2" value="2" />
 <Picker.Item label="Grid 3" value="3" />
@@ -43,7 +46,8 @@ viewStyle:{
     },
     
     textStyle: {
-        fontSize:20
+        fontSize:20,
+        paddingTop:5
     },
     
 });

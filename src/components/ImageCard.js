@@ -1,29 +1,30 @@
 import React from 'react';
-import {View,FlatList,StyleSheet,TouchableOpacity,Text} from 'react-native';
+import {View,FlatList,StyleSheet,Text,Modal,TouchableHighlight,Alert} from 'react-native';
 import {Image} from 'react-native-elements';
 
 class ImageCard extends React.PureComponent {
 
-   state={page_no:1}
+  state={page_no:1,modalVisible:false}
 
-renderItem =({item}) =>(
-    
-    <TouchableOpacity style={styles.MainContainer}>
-    
-    <View style={{flex: 1, flexDirection: 'column', margin: 1 }}>
-            <Image
-                  style={styles.imageThumbnail}
-                  source={{uri: item.urls.regular}}
-                />
-                </View>
-                </TouchableOpacity>
-            
-);
+  renderItem =({item}) =>(
+    <View style={{flex: 1,flexDirection:'column', margin:1 }}>
+      <View >
+        <TouchableHighlight onPress={() => {
+                    this.props.modalMethod(item.urls.regular);
+                  }}>
+          <Image
+              style={{height:100}}
+              source={{uri: item.urls.regular}}
+            />
+        </TouchableHighlight>
+      </View>
+    </View>            
+  );
 
 loadMore = () => {
   let page=this.state.page_no+1;
   this.setState({page_no:page})
-  this.props.onScroll(this.state.page_no)
+  this.props.onScroll(page)
 }
 
 
@@ -32,6 +33,7 @@ loadMore = () => {
         return (
          <FlatList 
        data={this.props.images}
+       
        renderItem={this.renderItem}
        keyExtractor={(item,index) =>item.id}
        key={this.props.value}
@@ -39,6 +41,7 @@ loadMore = () => {
 
        onEndReached={this.loadMore}
        onEndReachedThreshold={0.9}
+      
        />
       
     )
@@ -53,11 +56,7 @@ const styles= StyleSheet.create({
         paddingTop: 10,
       },
     
-      imageThumbnail: {
-        
-        height: 100,
       
-      }
 })
 
 export default ImageCard;

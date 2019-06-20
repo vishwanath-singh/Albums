@@ -1,17 +1,27 @@
 import React from 'react';
-import {View,NetInfo,AsyncStorage} from 'react-native';
+import {View,NetInfo,Modal,TouchableHighlight} from 'react-native';
 import Header from './src/components/header';
 import SearchInput from './src/components/SearchInput';
 import ImageCard from './src/components/ImageCard';
+import OfflineStorage from './src/components/OfflineStorage';
 import unsplash from './api/unsplash';
+import {Image} from 'react-native-elements';
 
 class App extends React.Component {
-
-  state={images:[],value:2,isConnected:true,storage:[],page_no:1};
+  
+  state={
+     images:[],
+     value:2,
+     isConnected:true,
+     page_no:1,
+     term:'',
+     modalUri: '',
+     modalVisible: false,
+   };
 
   componentDidMount(){
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
-  }
+    }
 
   componentWillUnmount() {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
@@ -25,61 +35,72 @@ class App extends React.Component {
     }
   };
 
+  changeModalUri = (uri) => {
+     this.setState({modalUri: uri});
+     this.setState({modalVisible: true});
+  }
+
   onValueSubmit= async(search) => {
+    if(this.state.term!==search) {
+      this.setState({images:[]})
+    }
+    
     const response=await unsplash.get('/search/photos/',
     {
         params:{
             query:search,
             page:this.state.page_no,
-            per_page:30,
+            per_page:15
            
         }
     
     });
-    this.setState({images:response.data.results});
-    
-    try{
-      await AsyncStorage.setItem(search,JSON.stringify(this.state.images))
-  } catch (error) {
-      //Error saving data
-  }
-     
-    
-  };
+    this.setState({term:search})
 
-  onValueSelect = (value) => {
+     this.setState({
+          images:this.state.images.concat(response.data.results)
+       })
+    
+};
 
-this.setState({value})
-  }
+  onValueSelect = (value) => {this.setState({value})}
 
   onScrollMore=(page_no) => {
-this.setState({page_no})
-  }
+this.setState({page_no});
+this.onValueSubmit(this.state.term);
+}
 
     
-       retrieveData = async(search) => {
-        try {
-         const storage = await JSON.parse(AsyncStorage.getItem(search));
-          if (storage !== null) {
-           this.setState({storage})
-          }
-        
-          
-        } catch (error) {
-          // Error retrieving data
-        }
-      };
+  onOfflineSubmit = (search) => { this.setState({term:search}) }
+  
+  FetchData = (storage) => { this.setState({images:storage}) }
 
-  
-  
   render() {
    if(this.state.isConnected){
     return (
       <View>
            <Header headerText= 'Imagify' onSelect={this.onValueSelect}/>
        <SearchInput onSubmit={this.onValueSubmit} />
-       <ImageCard images={this.state.images} value={this.state.value} onScroll={this.onScrollMore}/>
-        
+       <ImageCard images={this.state.images} value={this.state.value} onScroll={this.onScrollMore} modalMethod={this.changeModalUri}/>
+       <OfflineStorage images={this.state.images}  term={this.state.term} isConnected={this.state.isConnected}/>
+      
+       <Modal
+        animationType="fade"
+        transparent={true}
+        visible={this.state.modalVisible}
+        onRequestClose={() => {
+         this.setState({modalVisible:!this.state.modalVisible});
+      }}>
+        <TouchableHighlight onPress={() => {
+          this.setState({modalVisible:!this.state.modalVisible});
+        }}>
+          <View style={{flex:1,alignContent:'center',justifyContent:'center',position:'relative',top:250}}>
+            <Image 
+            style={{height:200}}
+            source={{uri: this.state.modalUri}}/>
+          </View>
+        </TouchableHighlight>
+      </Modal>
        </View>
       )
      
@@ -88,8 +109,26 @@ this.setState({page_no})
    else return (
      <View>
        <Header headerText= 'Imagify' onSelect={this.onValueSelect}/>
-       <SearchInput onSubmit={this.retrieveData}/>
-       <ImageCard images={this.state.storage} value={this.state.value} onScroll={this.onScrollMore}/>
+       <SearchInput onSubmit={this.onOfflineSubmit}/>
+       <ImageCard images={this.state.images} value={this.state.value} onScroll={this.onScrollMore} modalMethod={this.changeModalUri}/>
+      <OfflineStorage term={this.state.term} isConnected={this.state.isConnected} onDataFetch={this.FetchData}/>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={this.state.modalVisible}
+        onRequestClose={() => {
+         this.setState({modalVisible:!this.state.modalVisible});
+      }}>
+        <TouchableHighlight onPress={() => {
+          this.setState({modalVisible:!this.state.modalVisible});
+        }}>
+          <View style={{flex:1,alignContent:'center',justifyContent:'center',position:'relative',top:250}}>
+            <Image 
+             style={{height:200}}
+             source={{uri: this.state.modalUri}}/>
+          </View>
+        </TouchableHighlight>
+      </Modal>
      </View>
    )
     }
